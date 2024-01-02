@@ -1,7 +1,8 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import bookRouter from "./routes/book.routes";
+import productRouter from "./routes/product.routes";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 dotenv.config();
 
@@ -35,6 +36,8 @@ mongoose
     console.log("[server]: Connected to MongoDB Atlas.");
   });
 
+mongoose.plugin(mongoosePaginate);
+
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -43,7 +46,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server.");
 });
 
-app.use("/api/books", bookRouter);
+app.use("/api/products", productRouter);
 
 app.listen(PORT, () => {
   console.log(`[server]: Server is running at http://localhost:${PORT}`);
