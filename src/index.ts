@@ -1,8 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
 import productRouter from "./routes/product.routes";
-import mongoosePaginate from "mongoose-paginate-v2";
+import { connectToDB } from "./configs/db.config";
 
 dotenv.config();
 
@@ -11,10 +10,10 @@ const app: Express = express();
 // Enviroment variables
 
 const PORT = process.env.PORT || 8080;
-const DB_USER = process.env.DB_USER;
-const DB_PASSWORD = process.env.DB_PASS;
-const DB_NAME = process.env.DB_NAME;
-const CLUSTER_URL = process.env.CLUSTER_URL;
+
+// Middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Cors middleware
 app.use((req, res, next) => {
@@ -27,26 +26,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Mongoose configuration
-mongoose
-  .connect(
-    `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${CLUSTER_URL}/${DB_NAME}?retryWrites=true&w=majority`
-  )
-  .then(() => {
-    console.log("[server]: Connected to MongoDB Atlas.");
-  });
-
-mongoose.plugin(mongoosePaginate);
-
-// Middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server.");
+// Routes
+app.get("/health", (req: Request, res: Response) => {
+  res.send("Server is up and running.");
 });
 
 app.use("/api/products", productRouter);
+
+// Mongoose initialization
+connectToDB();
 
 app.listen(PORT, () => {
   console.log(`[server]: Server is running at http://localhost:${PORT}`);

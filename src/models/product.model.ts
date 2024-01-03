@@ -1,22 +1,6 @@
 import { PaginateModel, Schema, model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
-
-interface IProduct extends Document {
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  category: string;
-  thumbnail: string[];
-  brand: string;
-  code: string;
-  color: string[];
-  reviews: {
-    name: string;
-    comment: string;
-    rating: number;
-  }[];
-}
+import { IProductDoc } from "../interfaces/product";
 
 interface ProductModel<T extends Document> extends PaginateModel<T> {}
 
@@ -25,8 +9,8 @@ const productCollection = "catalogue";
 const reviewSchema = new Schema(
   {
     name: { type: String, required: true },
-    comment: { type: String, required: true },
-    rating: { type: Number, required: true },
+    comment: { type: String, required: true, min: 10, max: 500 },
+    rating: { type: Number, required: true, min: 1, max: 5 },
   },
   { _id: false }
 );
@@ -46,9 +30,11 @@ const productSchema = new Schema({
   code: { type: String, required: true, unique: true },
   color: { type: Array, required: true },
   reviews: { type: [reviewSchema], required: true },
+  createdAt: { type: Date, default: Date.now },
+  isPublished: { type: Boolean, default: false },
 }).plugin(mongoosePaginate);
 
-export const ProductModel: ProductModel<IProduct> = model<IProduct>(
+export const ProductModel: ProductModel<IProductDoc> = model<IProductDoc>(
   productCollection,
   productSchema
-) as ProductModel<IProduct>;
+) as ProductModel<IProductDoc>;
