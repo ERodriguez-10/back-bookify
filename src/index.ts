@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import productRouter from "./routes/product.routes";
 import { connectToDB } from "./configs/db.config";
+import authRouter from "./routes/auth.routes";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.get("/health", (req: Request, res: Response) => {
 });
 
 app.use("/api/products", productRouter);
+app.use("/api/auth", authRouter);
 
 // Mongoose initialization
 connectToDB();
